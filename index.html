@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        /* Menu Screen */
+        .menu-screen {
+            text-align: center;
+            color: white;
+        }
+        
+        .menu-screen h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+        }
+        
+        .menu-screen p {
+            font-size: 18px;
+            margin-bottom: 40px;
+            color: #ddd;
+        }
+        
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 400px;
+        }
+        
+        .menu-btn {
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: 3px solid white;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .menu-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #764ba2, #667eea);
+            box-shadow: 0 10px 30px rgba(255, 235, 59, 0.3);
+        }
+        
+        .menu-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* Game Wrapper */
+        .game-wrapper {
+            text-align: center;
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .game-header h1 {
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            flex: 1;
+        }
+        
+        .back-btn {
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 18px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: #ffeb3b;
+        }
+        
+        canvas {
+            display: block;
+            background: linear-gradient(180deg, #0f1419 0%, #1a1f2e 100%);
+            border: 3px solid #ffeb3b;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255, 235, 59, 0.3);
+            margin: 20px 0;
+        }
+        
+        .platformer-canvas {
+            border-color: #6bcf7f;
+            box-shadow: 0 0 30px rgba(107, 207, 127, 0.3);
+        }
+        
+        .instructions {
+            color: #ddd;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 30px;
+            background: #ffeb3b;
+            color: #1e3c72;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #fdd835;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 235, 59, 0.3);
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        .platformer-btn {
+            background: #6bcf7f;
+            color: white;
+        }
+        
+        .platformer-btn:hover {
+            background: #5ab86e;
+            box-shadow: 0 5px 15px rgba(107, 207, 127, 0.3);
+        }
+        
+        .message {
+            color: #ffeb3b;
+            font-size: 18px;
+            min-height: 30px;
+            margin-top: 15px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .platformer-message {
+            color: #6bcf7f;
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Screen -->
+    <div id="menuScreen" class="screen active menu-screen">
+        <h1>🎮 GAME HUB</h1>
+        <p>Choose a game to play:</p>
+        <div class="menu-buttons">
+            <button class="menu-btn" onclick="goToGame('brick')">🧱 Brick Breaker</button>
+            <button class="menu-btn" onclick="goToGame('fps')">🔫 DOOM-LIKE FPS</button>
+        </div>
+    </div>
+    
+    <!-- Brick Breaker Game Screen -->
+    <div id="brickScreen" class="screen">
+        <div class="game-wrapper">
+            <div class="game-header">
+                <h1>🧱 Brick Breaker</h1>
+                <button class="back-btn" onclick="backToMenu()">← Back</button>
+            </div>
+            <p class="instructions">Use arrow keys or mouse to move the paddle. Break all the bricks!</p>
+            
+            <div class="stats">
+                <div class="stat-item">Score: <span class="stat-value" id="brickScore">0</span></div>
+                <div class="stat-item">Lives: <span class="stat-value" id="brickLives">3</span></div>
+                <div class="stat-item">Bricks: <span class="stat-value" id="brickCount">0</span></div>
+            </div>
+            
+            <canvas id="brickCanvas" width="800" height="600"></canvas>
+            
+            <div class="button-group">
+                <button onclick="startBrickGame()">Start Game</button>
+                <button onclick="pauseBrickGame()">Pause</button>
+                <button onclick="resetBrickGame()">Reset</button>
+            </div>
+            
+            <div class="message" id="brickMessage"></div>
+        </div>
+    </div>
+    
+    <!-- 3D Platformer Game Screen -->
+    <div id="fpsScreen" class="screen">
+        <div class="game-wrapper">
+            <div class="game-header">
+                <h1>🎯 3D PLATFORMER</h1>
+                <button class="back-btn" onclick="backToMenu()">← Back</button>
+            </div>
+            <p class="instructions">WASD to move, SPACE to jump. Reach the goal at the top!</p>
+            
+            <div class="stats">
+                <div class="stat-item">Height: <span class="stat-value" id="fpsHealth">0</span>m</div>
+                <div class="stat-item">Level: <span class="stat-value" id="fpsAmmo">1</span></div>
+                <div class="stat-item">Best: <span class="stat-value" id="fpsKills">0</span>m</div>
+            </div>
+            
+            <canvas id="fpsCanvas" class="platformer-canvas" width="800" height="600"></canvas>
+            
+            <div class="button-group">
+                <button class="platformer-btn" onclick="startFpsGame()">Start Game</button>
+                <button class="platformer-btn" onclick="resetFpsGame()">Reset</button>
+            </div>
+            
+            <div class="message platformer-message" id="fpsMessage"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Screen Navigation
+        function goToGame(game) {
+            document.getElementById('menuScreen').classList.remove('active');
+            if (game === 'brick') {
+                document.getElementById('brickScreen').classList.add('active');
+                resetBrickGame();
+            } else if (game === 'fps') {
+                document.getElementById('fpsScreen').classList.add('active');
+                resetFpsGame();
+            }
+        }
+        
+        function backToMenu() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('menuScreen').classList.add('active');
+        }
+        
+        // ===== BRICK BREAKER GAME =====
+        const brickCanvas = document.getElementById('brickCanvas');
+        const brickCtx = brickCanvas.getContext('2d');
+        
+        let brickScore = 0;
+        let brickLives = 3;
+        let brickGameRunning = false;
+        let brickGamePaused = false;
+        
+        const brickPaddle = {
+            x: (brickCanvas.width - 80) / 2,
+            y: brickCanvas.height - 30,
+            width: 80,
+            height: 15,
+            dx: 0,
+            speed: 6
+        };
+        
+        const brickBall = {
+            x: brickCanvas.width / 2,
+            y: brickCanvas.height - 60,
+            radius: 8,
+            dx: 4,
+            dy: -4
+        };
+        
+        let bricks = [];
+        const brickRowCount = 4;
+        const brickColumnCount = 8;
+        const brickWidth = 90;
+        const brickHeight = 18;
+        const brickPadding = 10;
+        
+        function createBricks() {
+            bricks = [];
+            for (let row = 0; row < brickRowCount; row++) {
+                for (let col = 0; col < brickColumnCount; col++) {
+                    bricks.push({
+                        x: col * (brickWidth + brickPadding) + 10,
+                        y: row * (brickHeight + brickPadding) + 30,
+                        width: brickWidth,
+                        height: brickHeight,
+                        active: true,
+                        color: `hsl(${(row * 90) + (col * 10)}, 100%, 50%)`
+                    });
+                }
+            }
+            updateBrickCount();
+        }
+        
+        function handleBrickMouseMove(e) {
+            const rect = brickCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            if (x > brickPaddle.width / 2 && x < brickCanvas.width - brickPaddle.width / 2) {
+                brickPaddle.x = x - brickPaddle.width / 2;
+            }
+        }
+        
+        function updateBrickPaddle() {
+            brickPaddle.x += brickPaddle.dx;
+            if (brickPaddle.x < 0) brickPaddle.x = 0;
+            if (brickPaddle.x + brickPaddle.width > brickCanvas.width) brickPaddle.x = brickCanvas.width - brickPaddle.width;
+        }
+        
+        function updateBrickBall() {
+            brickBall.x += brickBall.dx;
+            brickBall.y += brickBall.dy;
+            
+            if (brickBall.x - brickBall.radius < 0 || brickBall.x + brickBall.radius > brickCanvas.width) {
+                brickBall.dx = -brickBall.dx;
+            }
+            
+            if (brickBall.y - brickBall.radius < 0) {
+                brickBall.dy = -brickBall.dy;
+            }
+            
+            if (brickBall.dy > 0 &&
+                brickBall.x > brickPaddle.x &&
+                brickBall.x < brickPaddle.x + brickPaddle.width &&
+                brickBall.y + brickBall.radius > brickPaddle.y &&
+                brickBall.y < brickPaddle.y + brickPaddle.height) {
+                brickBall.dy = -brickBall.dy;
+                brickBall.dx = (brickBall.x - (brickPaddle.x + brickPaddle.width / 2)) * 0.1;
+            }
+            
+            for (let brick of bricks) {
+                if (!brick.active) continue;
+                if (brickBall.x > brick.x && brickBall.x < brick.x + brick.width &&
+                    brickBall.y > brick.y && brickBall.y < brick.y + brick.height) {
+                    brick.active = false;
+                    brickScore += 10;
+                    brickBall.dy = -brickBall.dy;
+                    updateBrickCount();
+                }
+            }
+            
+            if (brickBall.y > brickCanvas.height) {
+                brickLives--;
+                resetBrickBall();
+                if (brickLives <= 0) {
+                    brickGameRunning = false;
+                    document.getElementById('brickMessage').textContent = '💀 Game Over!';
+                }
+            }
+        }
+        
+        function resetBrickBall() {
+            brickBall.x = brickPaddle.x + brickPaddle.width / 2;
+            brickBall.y = brickPaddle.y - 20;
+            brickBall.dx = (Math.random() - 0.5) * 4;
+            brickBall.dy = -4;
+        }
+        
+        function updateBrickCount() {
+            document.getElementById('brickCount').textContent = bricks.filter(b => b.active).length;
+        }
+        
+        function drawBrickGame() {
+            brickCtx.fillStyle = 'rgba(15, 20, 25, 0.1)';
+            brickCtx.fillRect(0, 0, brickCanvas.width, brickCanvas.height);
+            
+            for (let brick of bricks) {
+                if (brick.active) {
+                    brickCtx.fillStyle = brick.color;
+                    brickCtx.fillRect(brick.x, brick.y, brick.width, brick.height);
+                    brickCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                    brickCtx.lineWidth = 1;
+                    brickCtx.strokeRect(brick.x, brick.y, brick.width, brick.height);
+                }
+            }
+            
+            brickCtx.fillStyle = '#ffeb3b';
+            brickCtx.fillRect(brickPaddle.x, brickPaddle.y, brickPaddle.width, brickPaddle.height);
+            
+            brickCtx.beginPath();
+            brickCtx.arc(brickBall.x, brickBall.y, brickBall.radius, 0, Math.PI * 2);
+            brickCtx.fillStyle = '#ff6b6b';
+            brickCtx.fill();
+            brickCtx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+            brickCtx.lineWidth = 2;
+            brickCtx.stroke();
+            
+            document.getElementById('brickScore').textContent = brickScore;
+            document.getElementById('brickLives').textContent = brickLives;
+        }
+        
+        function brickGameLoop() {
+            if (!brickGameRunning || brickGamePaused) {
+                drawBrickGame();
+                requestAnimationFrame(brickGameLoop);
+                return;
+            }
+            
+            updateBrickPaddle();
+            updateBrickBall();
+            drawBrickGame();
+            
+            if (bricks.every(b => !b.active)) {
+                brickGameRunning = false;
+                document.getElementById('brickMessage').textContent = '🎉 You Won!';
+            }
+            
+            requestAnimationFrame(brickGameLoop);
+        }
+        
+        function startBrickGame() {
+            if (!brickGameRunning) {
+                brickGameRunning = true;
+                brickGamePaused = false;
+                document.getElementById('brickMessage').textContent = '';
+            }
+        }
+        
+        function pauseBrickGame() {
+            if (brickGameRunning) {
+                brickGamePaused = !brickGamePaused;
+            }
+        }
+        
+        function resetBrickGame() {
+            brickScore = 0;
+            brickLives = 3;
+            brickGameRunning = false;
+            brickGamePaused = false;
+            createBricks();
+            resetBrickBall();
+            document.getElementById('brickMessage').textContent = '';
+            drawBrickGame();
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') brickPaddle.dx = -brickPaddle.speed;
+            if (e.key === 'ArrowRight') brickPaddle.dx = brickPaddle.speed;
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') brickPaddle.dx = 0;
+        });
+        
+        brickCanvas.addEventListener('mousemove', handleBrickMouseMove);
+        
+        // ===== 3D PLATFORMER GAME =====
+        const fpsCanvas = document.getElementById('fpsCanvas');
+        const fpsCtx = fpsCanvas.getContext('2d');
+        
+        let fpsRunning = false;
+        let frameCount = 0;
+        let platformerBestHeight = 0;
+        let platformerLevel = 1;
+        
+        // 3D platform data: [x, z, y (height), width, depth, color]
+        const platformerPlatforms = [
+            // Starting platform
+            { x: 5, z: 5, y: 0, width: 3, depth: 3, color: '#00ff00' },
+            
+            // Level 1 platforms
+            { x: 2, z: 10, y: 1.5, width: 2.5, depth: 2.5, color: '#00dd00' },
+            { x: 8, z: 10, y: 1.5, width: 2.5, depth: 2.5, color: '#00dd00' },
+            { x: 5, z: 15, y: 2.5, width: 2, depth: 2, color: '#00bb00' },
+            
+            // Level 2 platforms
+            { x: 1, z: 20, y: 3.5, width: 2, depth: 2, color: '#00aa00' },
+            { x: 9, z: 20, y: 3.5, width: 2, depth: 2, color: '#00aa00' },
+            { x: 5, z: 25, y: 4.5, width: 2.5, depth: 2.5, color: '#008800' },
+            
+            // Level 3 platforms
+            { x: 3, z: 30, y: 5.5, width: 1.5, depth: 1.5, color: '#006600' },
+            { x: 7, z: 30, y: 5.5, width: 1.5, depth: 1.5, color: '#006600' },
+            { x: 5, z: 35, y: 7, width: 3, depth: 3, color: '#ffff00' }, // Goal platform
+        ];
+        
+        const platformerPlayer = {
+            x: 5,
+            z: 5,
+            y: 0.5,
+            vx: 0,
+            vz: 0,
+            vy: 0,
+            speed: 0.08,
+            jumpPower: 0.3,
+            onGround: false,
+            size: 0.3
+        };
+        
+        const gravity = 0.015;
+        
+        function platformerUpdatePlayer() {
+            const keys = fpsKeys;
+            
+            // Horizontal movement
+            let moveX = 0;
+            let moveZ = 0;
+            
+            if (keys['w'] || keys['W']) moveZ += platformerPlayer.speed;
+            if (keys['s'] || keys['S']) moveZ -= platformerPlayer.speed;
+            if (keys['a'] || keys['A']) moveX -= platformerPlayer.speed;
+            if (keys['d'] || keys['D']) moveX += platformerPlayer.speed;
+            
+            platformerPlayer.x += moveX;
+            platformerPlayer.z += moveZ;
+            
+            // Gravity
+            platformerPlayer.vy -= gravity;
+            platformerPlayer.y += platformerPlayer.vy;
+            
+            // Platform collision
+            platformerPlayer.onGround = false;
+            for (let platform of platformerPlatforms) {
+                const px1 = platform.x - platform.width / 2;
+                const px2 = platform.x + platform.width / 2;
+                const pz1 = platform.z - platform.depth / 2;
+                const pz2 = platform.z + platform.depth / 2;
+                
+                // Check if player is above platform
+                if (platformerPlayer.x > px1 && platformerPlayer.x < px2 &&
+                    platformerPlayer.z > pz1 && platformerPlayer.z < pz2) {
+                    
+                    // Player is on the platform
+                    if (platformerPlayer.y - platformerPlayer.size < platform.y + 0.1 && 
+                        platformerPlayer.vy <= 0) {
+                        platformerPlayer.y = platform.y + platformerPlayer.size;
+                        platformerPlayer.vy = 0;
+                        platformerPlayer.onGround = true;
+                    }
+                }
+            }
+            
+            // Fall off world
+            if (platformerPlayer.y < -5) {
+                platformerResetPlayer();
+                document.getElementById('fpsMessage').textContent = '💀 Fell off! Try again!';
+            }
+            
+            // Check if reached goal
+            const goalPlatform = platformerPlatforms[platformerPlatforms.length - 1];
+            const goalX1 = goalPlatform.x - goalPlatform.width / 2;
+            const goalX2 = goalPlatform.x + goalPlatform.width / 2;
+            const goalZ1 = goalPlatform.z - goalPlatform.depth / 2;
+            const goalZ2 = goalPlatform.z + goalPlatform.depth / 2;
+            
+            if (platformerPlayer.x > goalX1 && platformerPlayer.x < goalX2 &&
+                platformerPlayer.z > goalZ1 && platformerPlayer.z < goalZ2 &&
+                platformerPlayer.y > goalPlatform.y) {
+                fpsRunning = false;
+                document.getElementById('fpsMessage').textContent = '🎉 Level Complete! Next level!';
+                platformerBestHeight = Math.max(platformerBestHeight, Math.floor(platformerPlayer.y * 10) / 10);
+                platformerLevel++;
+            }
+        }
+        
+        function platformerDrawWorld() {
+            const width = fpsCanvas.width;
+            const height = fpsCanvas.height;
+            
+            // Create a depth buffer
+            const depthBuffer = Array(width).fill(null).map(() => ({}));
+            
+            // Render each platform
+            for (let platform of platformerPlatforms) {
+                // Convert 3D position to screen space
+                const relX = platform.x - platformerPlayer.x;
+                const relZ = platform.z - platformerPlayer.z;
+                const relY = platform.y - platformerPlayer.y;
+                
+                // Simple perspective projection
+                const distance = Math.sqrt(relX * relX + relZ * relZ) + 0.01;
+                const screenX = (width / 2) + (relX / distance) * (width / 4);
+                const screenZ = (relZ / distance);
+                
+                // Skip if behind player
+                if (screenZ <= 0.5) continue;
+                
+                // Scale based on distance
+                const scale = Math.max(5, (height / (distance * 3)));
+                const platformWidth = Math.max(10, scale * (platform.width * 2));
+                const platformHeight = Math.max(5, scale * (platform.depth * 2));
+                
+                // Y position with height offset
+                const screenY = (height / 2) - (relY * scale * 3);
+                
+                // Brightness based on distance
+                const brightness = Math.max(0.3, 1 - (distance / 15));
+                
+                // Draw platform
+                fpsCtx.globalAlpha = brightness;
+                fpsCtx.fillStyle = platform.color;
+                fpsCtx.fillRect(screenX - platformWidth/2, screenY - platformHeight/2, platformWidth, platformHeight);
+                
+                // Platform outline
+                fpsCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                fpsCtx.lineWidth = 2;
+                fpsCtx.strokeRect(screenX - platformWidth/2, screenY - platformHeight/2, platformWidth, platformHeight);
+                
+                fpsCtx.globalAlpha = 1.0;
+            }
+            
+            // Draw player (crosshair in center)
+            fpsCtx.fillStyle = '#ff0000';
+            fpsCtx.fillRect(width/2 - 5, height/2 - 5, 10, 10);
+            fpsCtx.strokeStyle = '#ffffff';
+            fpsCtx.lineWidth = 2;
+            fpsCtx.strokeRect(width/2 - 5, height/2 - 5, 10, 10);
+            
+            // Draw background gradient
+            const bgGradient = fpsCtx.createLinearGradient(0, 0, 0, height);
+            bgGradient.addColorStop(0, '#1a1a2e');
+            bgGradient.addColorStop(1, '#16213e');
+            fpsCtx.fillStyle = bgGradient;
+            fpsCtx.fillRect(0, 0, width, height);
+            
+            // Redraw platforms and player over background
+            for (let platform of platformerPlatforms) {
+                const relX = platform.x - platformerPlayer.x;
+                const relZ = platform.z - platformerPlayer.z;
+                const relY = platform.y - platformerPlayer.y;
+                
+                const distance = Math.sqrt(relX * relX + relZ * relZ) + 0.01;
+                const screenX = (width / 2) + (relX / distance) * (width / 4);
+                
+                if (relZ <= 0.5) continue;
+                
+                const scale = Math.max(5, (height / (distance * 3)));
+                const platformWidth = Math.max(10, scale * (platform.width * 2));
+                const platformHeight = Math.max(5, scale * (platform.depth * 2));
+                const screenY = (height / 2) - (relY * scale * 3);
+                const brightness = Math.max(0.3, 1 - (distance / 15));
+                
+                fpsCtx.globalAlpha = brightness;
+                fpsCtx.fillStyle = platform.color;
+                fpsCtx.fillRect(screenX - platformWidth/2, screenY - platformHeight/2, platformWidth, platformHeight);
+                fpsCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                fpsCtx.lineWidth = 2;
+                fpsCtx.strokeRect(screenX - platformWidth/2, screenY - platformHeight/2, platformWidth, platformHeight);
+                fpsCtx.globalAlpha = 1.0;
+            }
+            
+            // Draw player indicator
+            fpsCtx.fillStyle = '#ff0000';
+            fpsCtx.fillRect(width/2 - 5, height/2 - 5, 10, 10);
+            fpsCtx.strokeStyle = '#ffffff';
+            fpsCtx.lineWidth = 2;
+            fpsCtx.strokeRect(width/2 - 5, height/2 - 5, 10, 10);
+            
+            // HUD
+            const currentHeight = Math.max(0, Math.floor(platformerPlayer.y * 10) / 10);
+            document.getElementById('fpsHealth').textContent = currentHeight;
+            document.getElementById('fpsAmmo').textContent = platformerLevel;
+            document.getElementById('fpsKills').textContent = platformerBestHeight;
+        }
+        
+        function platformerGameLoop() {
+            if (fpsRunning) {
+                platformerUpdatePlayer();
+            }
+            platformerDrawWorld();
+            frameCount++;
+            requestAnimationFrame(platformerGameLoop);
+        }
+        
+        function platformerResetPlayer() {
+            platformerPlayer.x = 5;
+            platformerPlayer.z = 5;
+            platformerPlayer.y = 0.5;
+            platformerPlayer.vx = 0;
+            platformerPlayer.vz = 0;
+            platformerPlayer.vy = 0;
+        }
+        
+        function startFpsGame() {
+            fpsRunning = true;
+            document.getElementById('fpsMessage').textContent = 'Jump to the platforms!';
+        }
+        
+        function resetFpsGame() {
+            fpsRunning = false;
+            platformerLevel = 1;
+            platformerResetPlayer();
+            document.getElementById('fpsMessage').textContent = 'Press Start to begin!';
+            platformerDrawWorld();
+        }
+        
+        const fpsKeys = {};
+        document.addEventListener('keydown', (e) => {
+            fpsKeys[e.key] = true;
+            if ((e.key === ' ') && platformerPlayer.onGround && fpsRunning) {
+                platformerPlayer.vy = platformerPlayer.jumpPower;
+                platformerPlayer.onGround = false;
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            fpsKeys[e.key] = false;
+        });
+        
+        // Initialize games
+        resetBrickGame();
+        brickGameLoop();
+        resetFpsGame();
+        platformerGameLoop();
+    </script>
+</body>
+</html>
