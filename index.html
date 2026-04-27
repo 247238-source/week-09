@@ -3,752 +3,1238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Hub</title>
+    <title>Sector Zero</title>
     <style>
+        :root {
+            --bg: #0b0f14;
+            --panel: rgba(10, 16, 24, 0.82);
+            --panel-border: rgba(255, 255, 255, 0.12);
+            --text: #e8edf3;
+            --muted: #9fb0c4;
+            --accent: #ff6a3d;
+            --accent-2: #ffd166;
+            --danger: #ff4d6d;
+            --ok: #7bd389;
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            overflow: hidden;
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at top, rgba(255, 106, 61, 0.18), transparent 32%),
+                linear-gradient(180deg, #141a22 0%, #080b10 100%);
+            color: var(--text);
         }
-        
-        .screen {
-            display: none;
+
+        .game-shell {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
         }
-        
-        .screen.active {
+
+        canvas {
+            width: 100%;
+            height: 100%;
             display: block;
+            image-rendering: pixelated;
         }
-        
-        /* Menu Screen */
-        .menu-screen {
-            text-align: center;
-            color: white;
+
+        .hud {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
         }
-        
-        .menu-screen h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
-        }
-        
-        .menu-screen p {
-            font-size: 18px;
-            margin-bottom: 40px;
-            color: #ddd;
-        }
-        
-        .menu-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 400px;
-        }
-        
-        .menu-btn {
-            padding: 20px 40px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: 3px solid white;
-            border-radius: 10px;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        .menu-btn:hover {
-            transform: scale(1.05);
-            background: linear-gradient(135deg, #764ba2, #667eea);
-            box-shadow: 0 10px 30px rgba(255, 235, 59, 0.3);
-        }
-        
-        .menu-btn:active {
-            transform: scale(0.95);
-        }
-        
-        /* Game Wrapper */
-        .game-wrapper {
-            text-align: center;
-        }
-        
-        .game-header {
+
+        .top-bar {
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            right: 18px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            color: white;
+            gap: 16px;
         }
-        
-        .game-header h1 {
-            font-size: 32px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            flex: 1;
-        }
-        
-        .back-btn {
-            padding: 10px 20px;
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .back-btn:hover {
-            background: #ff5252;
-            transform: scale(1.05);
-        }
-        
-        .stats {
+
+        .cluster {
             display: flex;
-            justify-content: space-around;
-            color: white;
-            margin-bottom: 20px;
-            font-size: 18px;
-            gap: 20px;
+            gap: 12px;
             flex-wrap: wrap;
         }
-        
-        .stat-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px 20px;
-            border-radius: 5px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+
+        .panel {
+            min-width: 120px;
+            padding: 10px 14px;
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
         }
-        
-        .stat-value {
-            font-weight: bold;
-            color: #ffeb3b;
-        }
-        
-        canvas {
+
+        .label {
             display: block;
-            background: linear-gradient(180deg, #0f1419 0%, #1a1f2e 100%);
-            border: 3px solid #ffeb3b;
-            border-radius: 10px;
-            box-shadow: 0 0 30px rgba(255, 235, 59, 0.3);
-            margin: 20px 0;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 6px;
         }
-        
-        .platformer-canvas {
-            border-color: #6bcf7f;
-            box-shadow: 0 0 30px rgba(107, 207, 127, 0.3);
+
+        .value {
+            font-size: 26px;
+            font-weight: 700;
+            line-height: 1;
         }
-        
-        .instructions {
-            color: #ddd;
-            margin-bottom: 20px;
-            font-size: 14px;
+
+        .value.health {
+            color: var(--danger);
         }
-        
-        .button-group {
+
+        .value.ammo {
+            color: var(--accent-2);
+        }
+
+        .value.score {
+            color: var(--ok);
+        }
+
+        .bottom-bar {
+            position: absolute;
+            left: 18px;
+            right: 18px;
+            bottom: 18px;
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: end;
+            gap: 16px;
+        }
+
+        .status-panel {
+            max-width: min(560px, calc(100vw - 36px));
+        }
+
+        .status-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent-2);
+            margin-bottom: 8px;
+        }
+
+        .status-text {
+            color: var(--text);
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .controls {
+            text-align: right;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
             justify-content: center;
+            padding: 24px;
+            background: rgba(4, 7, 11, 0.6);
+            backdrop-filter: blur(10px);
+            pointer-events: auto;
+        }
+
+        .overlay.hidden {
+            display: none;
+        }
+
+        .dialog {
+            width: min(720px, 100%);
+            padding: 28px;
+            background: rgba(8, 12, 18, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            box-shadow: 0 28px 80px rgba(0, 0, 0, 0.42);
+        }
+
+        .eyebrow {
+            color: var(--accent-2);
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: clamp(40px, 8vw, 78px);
+            line-height: 0.95;
+            margin-bottom: 18px;
+        }
+
+        .lead {
+            color: var(--muted);
+            font-size: clamp(16px, 2vw, 20px);
+            max-width: 48ch;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .brief {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .brief .panel {
+            min-width: 0;
+        }
+
+        .brief .value {
+            font-size: 16px;
+            line-height: 1.3;
+            color: var(--text);
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
             flex-wrap: wrap;
         }
-        
+
         button {
-            padding: 12px 30px;
-            background: #ffeb3b;
-            color: #1e3c72;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
+            appearance: none;
+            border: 0;
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: transform 0.18s ease, opacity 0.18s ease, background 0.18s ease;
         }
-        
+
         button:hover {
-            background: #fdd835;
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(255, 235, 59, 0.3);
+            transform: translateY(-1px);
         }
-        
+
         button:active {
-            transform: scale(0.98);
+            transform: translateY(0);
         }
-        
-        .platformer-btn {
-            background: #6bcf7f;
-            color: white;
+
+        .primary {
+            background: linear-gradient(135deg, var(--accent), #ff835c);
+            color: #fff;
         }
-        
-        .platformer-btn:hover {
-            background: #5ab86e;
-            box-shadow: 0 5px 15px rgba(107, 207, 127, 0.3);
+
+        .secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.12);
         }
-        
-        .message {
-            color: #ffeb3b;
-            font-size: 18px;
-            min-height: 30px;
-            margin-top: 15px;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+
+        .crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            opacity: 0.94;
         }
-        
-        .platformer-message {
-            color: #6bcf7f;
+
+        .crosshair::before,
+        .crosshair::after {
+            content: "";
+            position: absolute;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.24);
+        }
+
+        .crosshair::before {
+            width: 2px;
+            height: 24px;
+            left: 11px;
+            top: 0;
+        }
+
+        .crosshair::after {
+            width: 24px;
+            height: 2px;
+            left: 0;
+            top: 11px;
+        }
+
+        .hit-flash {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 77, 109, 0.22);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.08s linear;
+        }
+
+        .hit-flash.visible {
+            opacity: 1;
+        }
+
+        @media (max-width: 720px) {
+            .top-bar,
+            .bottom-bar {
+                left: 12px;
+                right: 12px;
+            }
+
+            .top-bar {
+                top: 12px;
+            }
+
+            .bottom-bar {
+                bottom: 12px;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .controls {
+                text-align: left;
+            }
+
+            .panel {
+                padding: 9px 12px;
+            }
+
+            .value {
+                font-size: 22px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Menu Screen -->
-    <div id="menuScreen" class="screen active menu-screen">
-        <h1>🎮 GAME HUB</h1>
-        <p>Choose a game to play:</p>
-        <div class="menu-buttons">
-            <button class="menu-btn" onclick="goToGame('brick')">🧱 Brick Breaker</button>
-            <button class="menu-btn" onclick="goToGame('fps')">🔫 DOOM-LIKE FPS</button>
+    <div class="game-shell">
+        <canvas id="gameCanvas" width="960" height="540" aria-label="Sector Zero game view"></canvas>
+
+        <div class="hud">
+            <div class="top-bar">
+                <div class="cluster">
+                    <div class="panel">
+                        <span class="label">Health</span>
+                        <span class="value health" id="healthValue">100</span>
+                    </div>
+                    <div class="panel">
+                        <span class="label">Ammo</span>
+                        <span class="value ammo" id="ammoValue">12</span>
+                    </div>
+                    <div class="panel">
+                        <span class="label">Armor</span>
+                        <span class="value" id="armorValue">50</span>
+                    </div>
+                </div>
+
+                <div class="cluster">
+                    <div class="panel">
+                        <span class="label">Score</span>
+                        <span class="value score" id="scoreValue">0</span>
+                    </div>
+                    <div class="panel">
+                        <span class="label">Targets</span>
+                        <span class="value" id="targetValue">6</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="crosshair"></div>
+            <div class="hit-flash" id="hitFlash"></div>
+
+            <div class="bottom-bar">
+                <div class="panel status-panel">
+                    <div class="status-title" id="statusTitle">Sector Zero</div>
+                    <div class="status-text" id="statusText">Clear the arena. Pick up ammo and med packs, keep moving, and line up your shots.</div>
+                </div>
+                <div class="panel controls">
+                    <div>`WASD` move</div>
+                    <div>Mouse look</div>
+                    <div>Click shoot</div>
+                    <div>`R` reload</div>
+                    <div>`Shift` sprint</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="overlay" id="overlay">
+            <div class="dialog">
+                <div class="eyebrow">Retro FPS Prototype</div>
+                <h1>Sector Zero</h1>
+                <p class="lead">One arena, one rifle, six hostiles. This is a proper browser shooter pass: raycast walls, moving enemies, pickups, damage, and a real win or lose loop.</p>
+
+                <div class="brief">
+                    <div class="panel">
+                        <span class="label">Mission</span>
+                        <div class="value">Eliminate every hostile in the facility.</div>
+                    </div>
+                    <div class="panel">
+                        <span class="label">Loadout</span>
+                        <div class="value">12 round magazine, reserve ammo, partial reloads.</div>
+                    </div>
+                    <div class="panel">
+                        <span class="label">Movement</span>
+                        <div class="value">Mouse look, strafe, sprint, collision, enemy pressure.</div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="primary" id="startButton">Enter Sector</button>
+                    <button class="secondary" id="restartButton">Restart Run</button>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <!-- Brick Breaker Game Screen -->
-    <div id="brickScreen" class="screen">
-        <div class="game-wrapper">
-            <div class="game-header">
-                <h1>🧱 Brick Breaker</h1>
-                <button class="back-btn" onclick="backToMenu()">← Back</button>
-            </div>
-            <p class="instructions">Use arrow keys or mouse to move the paddle. Break all the bricks!</p>
-            
-            <div class="stats">
-                <div class="stat-item">Score: <span class="stat-value" id="brickScore">0</span></div>
-                <div class="stat-item">Lives: <span class="stat-value" id="brickLives">3</span></div>
-                <div class="stat-item">Bricks: <span class="stat-value" id="brickCount">0</span></div>
-            </div>
-            
-            <canvas id="brickCanvas" width="800" height="600"></canvas>
-            
-            <div class="button-group">
-                <button onclick="startBrickGame()">Start Game</button>
-                <button onclick="pauseBrickGame()">Pause</button>
-                <button onclick="resetBrickGame()">Reset</button>
-            </div>
-            
-            <div class="message" id="brickMessage"></div>
-        </div>
-    </div>
-    
-    <!-- 3D Platformer Game Screen -->
-    <div id="fpsScreen" class="screen">
-        <div class="game-wrapper">
-            <div class="game-header">
-                <h1>🎯 3D PLATFORMER</h1>
-                <button class="back-btn" onclick="backToMenu()">← Back</button>
-            </div>
-            <p class="instructions">WASD to move, SPACE to jump. Reach the goal at the top!</p>
-            
-            <div class="stats">
-                <div class="stat-item">Height: <span class="stat-value" id="fpsHealth">0</span>m</div>
-                <div class="stat-item">Level: <span class="stat-value" id="fpsAmmo">1</span></div>
-                <div class="stat-item">Best: <span class="stat-value" id="fpsKills">0</span>m</div>
-            </div>
-            
-            <canvas id="fpsCanvas" class="platformer-canvas" width="800" height="600"></canvas>
-            
-            <div class="button-group">
-                <button class="platformer-btn" onclick="startFpsGame()">Start Game</button>
-                <button class="platformer-btn" onclick="resetFpsGame()">Reset</button>
-            </div>
-            
-            <div class="message platformer-message" id="fpsMessage"></div>
-        </div>
-    </div>
-    
+
     <script>
-        // Screen Navigation
-        function goToGame(game) {
-            document.getElementById('menuScreen').classList.remove('active');
-            if (game === 'brick') {
-                document.getElementById('brickScreen').classList.add('active');
-                resetBrickGame();
-            } else if (game === 'fps') {
-                document.getElementById('fpsScreen').classList.add('active');
-                resetFpsGame();
-            }
-        }
-        
-        function backToMenu() {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('menuScreen').classList.add('active');
-        }
-        
-        // ===== BRICK BREAKER GAME =====
-        const brickCanvas = document.getElementById('brickCanvas');
-        const brickCtx = brickCanvas.getContext('2d');
-        
-        let brickScore = 0;
-        let brickLives = 3;
-        let brickGameRunning = false;
-        let brickGamePaused = false;
-        
-        const brickPaddle = {
-            x: (brickCanvas.width - 80) / 2,
-            y: brickCanvas.height - 30,
-            width: 80,
-            height: 15,
-            dx: 0,
-            speed: 6
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const overlay = document.getElementById("overlay");
+        const startButton = document.getElementById("startButton");
+        const restartButton = document.getElementById("restartButton");
+
+        const healthValue = document.getElementById("healthValue");
+        const ammoValue = document.getElementById("ammoValue");
+        const armorValue = document.getElementById("armorValue");
+        const scoreValue = document.getElementById("scoreValue");
+        const targetValue = document.getElementById("targetValue");
+        const statusTitle = document.getElementById("statusTitle");
+        const statusText = document.getElementById("statusText");
+        const hitFlash = document.getElementById("hitFlash");
+
+        const map = [
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,2,0,0,0,0,0,0,1],
+            [1,0,1,1,0,0,1,0,0,1,1,0,0,1],
+            [1,0,0,0,0,0,1,0,0,0,1,0,0,1],
+            [1,0,0,1,0,0,0,0,1,0,0,0,0,1],
+            [1,0,0,1,0,0,3,0,1,0,0,1,0,1],
+            [1,0,0,0,0,1,1,0,0,0,0,1,0,1],
+            [1,0,1,0,0,0,0,0,1,0,0,0,0,1],
+            [1,0,1,0,0,1,0,0,1,0,1,0,0,1],
+            [1,0,0,0,0,1,0,0,0,0,1,0,0,1],
+            [1,0,0,1,0,0,0,1,0,0,0,0,4,1],
+            [1,0,0,1,0,0,0,1,0,1,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,1,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        ];
+
+        const wallColors = {
+            1: "#56667a",
+            2: "#8a5cf6",
+            3: "#ff6a3d",
+            4: "#2ec4b6"
         };
-        
-        const brickBall = {
-            x: brickCanvas.width / 2,
-            y: brickCanvas.height - 60,
-            radius: 8,
-            dx: 4,
-            dy: -4
+
+        const floorGradientStops = [
+            { stop: 0, color: "#222b35" },
+            { stop: 1, color: "#11151c" }
+        ];
+
+        const state = {
+            running: false,
+            gameOver: false,
+            win: false,
+            pointerReady: false,
+            score: 0,
+            muzzleFlash: 0,
+            damageFlash: 0,
+            messageTimer: 0,
+            currentMessage: "",
+            player: null,
+            enemies: [],
+            pickups: [],
+            keys: {},
+            lastTime: 0
         };
-        
-        let bricks = [];
-        const brickRowCount = 4;
-        const brickColumnCount = 8;
-        const brickWidth = 90;
-        const brickHeight = 18;
-        const brickPadding = 10;
-        
-        function createBricks() {
-            bricks = [];
-            for (let row = 0; row < brickRowCount; row++) {
-                for (let col = 0; col < brickColumnCount; col++) {
-                    bricks.push({
-                        x: col * (brickWidth + brickPadding) + 10,
-                        y: row * (brickHeight + brickPadding) + 30,
-                        width: brickWidth,
-                        height: brickHeight,
-                        active: true,
-                        color: `hsl(${(row * 90) + (col * 10)}, 100%, 50%)`
-                    });
+
+        const config = {
+            fov: Math.PI / 3,
+            maxDepth: 18,
+            moveSpeed: 2.8,
+            sprintSpeed: 4,
+            turnSpeed: 2.2,
+            enemySpeed: 1.2,
+            enemyDamage: 12,
+            enemyAttackRange: 0.85,
+            enemyCooldown: 1.15,
+            playerRadius: 0.22,
+            magSize: 12,
+            reloadTime: 1.2,
+            fireCooldown: 0.16,
+            hitScanRange: 10,
+            mouseSensitivity: 0.0026
+        };
+
+        const initialEnemies = [
+            { x: 3.5, y: 2.4, health: 55, speedJitter: 0.05 },
+            { x: 10.5, y: 2.5, health: 55, speedJitter: 0.1 },
+            { x: 7.5, y: 5.5, health: 65, speedJitter: -0.02 },
+            { x: 2.6, y: 8.4, health: 60, speedJitter: 0.08 },
+            { x: 11.4, y: 8.6, health: 60, speedJitter: -0.04 },
+            { x: 11.6, y: 11.5, health: 80, speedJitter: 0 }
+        ];
+
+        const initialPickups = [
+            { x: 2.4, y: 1.6, kind: "ammo", value: 12 },
+            { x: 12.2, y: 3.3, kind: "ammo", value: 8 },
+            { x: 6.5, y: 5.4, kind: "med", value: 30 },
+            { x: 8.4, y: 9.6, kind: "armor", value: 25 },
+            { x: 4.5, y: 12.2, kind: "med", value: 20 }
+        ];
+
+        function resetGame() {
+            state.running = false;
+            state.gameOver = false;
+            state.win = false;
+            state.score = 0;
+            state.muzzleFlash = 0;
+            state.damageFlash = 0;
+            state.messageTimer = 0;
+            state.currentMessage = "";
+
+            state.player = {
+                x: 1.7,
+                y: 1.7,
+                angle: 0,
+                health: 100,
+                armor: 50,
+                ammo: config.magSize,
+                reserveAmmo: 48,
+                fireTimer: 0,
+                reloadTimer: 0
+            };
+
+            state.enemies = initialEnemies.map((enemy, index) => ({
+                id: index,
+                x: enemy.x,
+                y: enemy.y,
+                health: enemy.health,
+                alive: true,
+                attackTimer: 0,
+                speed: config.enemySpeed + enemy.speedJitter,
+                pulse: Math.random() * Math.PI * 2
+            }));
+
+            state.pickups = initialPickups.map((pickup, index) => ({
+                id: index,
+                x: pickup.x,
+                y: pickup.y,
+                kind: pickup.kind,
+                value: pickup.value,
+                active: true
+            }));
+
+            showStatus("Sector Zero", "Clear the arena. Pick up ammo and med packs, keep moving, and line up your shots.");
+            updateHud();
+        }
+
+        function updateHud() {
+            healthValue.textContent = Math.max(0, Math.ceil(state.player.health));
+            armorValue.textContent = Math.max(0, Math.ceil(state.player.armor));
+            ammoValue.textContent = state.player.ammo + " / " + state.player.reserveAmmo;
+            scoreValue.textContent = state.score;
+            targetValue.textContent = state.enemies.filter(enemy => enemy.alive).length;
+        }
+
+        function showStatus(title, text, duration = 2.4) {
+            statusTitle.textContent = title;
+            statusText.textContent = text;
+            state.currentMessage = text;
+            state.messageTimer = duration;
+        }
+
+        function isWall(x, y) {
+            const mapX = Math.floor(x);
+            const mapY = Math.floor(y);
+            if (mapY < 0 || mapY >= map.length || mapX < 0 || mapX >= map[0].length) {
+                return true;
+            }
+            return map[mapY][mapX] !== 0;
+        }
+
+        function movePlayer(delta) {
+            const player = state.player;
+            const sprint = state.keys.Shift ? config.sprintSpeed : config.moveSpeed;
+            const step = sprint * delta;
+
+            let moveX = 0;
+            let moveY = 0;
+
+            const forwardX = Math.cos(player.angle);
+            const forwardY = Math.sin(player.angle);
+            const rightX = Math.cos(player.angle + Math.PI / 2);
+            const rightY = Math.sin(player.angle + Math.PI / 2);
+
+            if (state.keys.w || state.keys.W) {
+                moveX += forwardX * step;
+                moveY += forwardY * step;
+            }
+            if (state.keys.s || state.keys.S) {
+                moveX -= forwardX * step;
+                moveY -= forwardY * step;
+            }
+            if (state.keys.a || state.keys.A) {
+                moveX -= rightX * step;
+                moveY -= rightY * step;
+            }
+            if (state.keys.d || state.keys.D) {
+                moveX += rightX * step;
+                moveY += rightY * step;
+            }
+
+            if (state.keys.ArrowLeft) {
+                player.angle -= config.turnSpeed * delta;
+            }
+            if (state.keys.ArrowRight) {
+                player.angle += config.turnSpeed * delta;
+            }
+
+            tryMove(player, moveX, moveY);
+        }
+
+        function tryMove(entity, moveX, moveY) {
+            const radius = config.playerRadius;
+            const nextX = entity.x + moveX;
+            const nextY = entity.y + moveY;
+
+            if (!collides(nextX, entity.y, radius)) {
+                entity.x = nextX;
+            }
+            if (!collides(entity.x, nextY, radius)) {
+                entity.y = nextY;
+            }
+        }
+
+        function collides(x, y, radius) {
+            const checks = [
+                [x - radius, y - radius],
+                [x + radius, y - radius],
+                [x - radius, y + radius],
+                [x + radius, y + radius]
+            ];
+
+            return checks.some(point => isWall(point[0], point[1]));
+        }
+
+        function updatePlayerTimers(delta) {
+            const player = state.player;
+            player.fireTimer = Math.max(0, player.fireTimer - delta);
+            if (player.reloadTimer > 0) {
+                player.reloadTimer = Math.max(0, player.reloadTimer - delta);
+                if (player.reloadTimer === 0) {
+                    completeReload();
                 }
             }
-            updateBrickCount();
-        }
-        
-        function handleBrickMouseMove(e) {
-            const rect = brickCanvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            if (x > brickPaddle.width / 2 && x < brickCanvas.width - brickPaddle.width / 2) {
-                brickPaddle.x = x - brickPaddle.width / 2;
-            }
-        }
-        
-        function updateBrickPaddle() {
-            brickPaddle.x += brickPaddle.dx;
-            if (brickPaddle.x < 0) brickPaddle.x = 0;
-            if (brickPaddle.x + brickPaddle.width > brickCanvas.width) brickPaddle.x = brickCanvas.width - brickPaddle.width;
-        }
-        
-        function updateBrickBall() {
-            brickBall.x += brickBall.dx;
-            brickBall.y += brickBall.dy;
-            
-            if (brickBall.x - brickBall.radius < 0 || brickBall.x + brickBall.radius > brickCanvas.width) {
-                brickBall.dx = -brickBall.dx;
-            }
-            
-            if (brickBall.y - brickBall.radius < 0) {
-                brickBall.dy = -brickBall.dy;
-            }
-            
-            if (brickBall.dy > 0 &&
-                brickBall.x > brickPaddle.x &&
-                brickBall.x < brickPaddle.x + brickPaddle.width &&
-                brickBall.y + brickBall.radius > brickPaddle.y &&
-                brickBall.y < brickPaddle.y + brickPaddle.height) {
-                brickBall.dy = -brickBall.dy;
-                brickBall.dx = (brickBall.x - (brickPaddle.x + brickPaddle.width / 2)) * 0.1;
-            }
-            
-            for (let brick of bricks) {
-                if (!brick.active) continue;
-                if (brickBall.x > brick.x && brickBall.x < brick.x + brick.width &&
-                    brickBall.y > brick.y && brickBall.y < brick.y + brick.height) {
-                    brick.active = false;
-                    brickScore += 10;
-                    brickBall.dy = -brickBall.dy;
-                    updateBrickCount();
-                }
-            }
-            
-            if (brickBall.y > brickCanvas.height) {
-                brickLives--;
-                resetBrickBall();
-                if (brickLives <= 0) {
-                    brickGameRunning = false;
-                    document.getElementById('brickMessage').textContent = '💀 Game Over!';
+
+            state.muzzleFlash = Math.max(0, state.muzzleFlash - delta * 6);
+            state.damageFlash = Math.max(0, state.damageFlash - delta * 4);
+
+            if (state.messageTimer > 0) {
+                state.messageTimer -= delta;
+                if (state.messageTimer <= 0 && !state.gameOver && !state.win) {
+                    statusTitle.textContent = "Sector Zero";
+                    statusText.textContent = "Keep moving. Hostiles can corner you if you stand still.";
                 }
             }
         }
-        
-        function resetBrickBall() {
-            brickBall.x = brickPaddle.x + brickPaddle.width / 2;
-            brickBall.y = brickPaddle.y - 20;
-            brickBall.dx = (Math.random() - 0.5) * 4;
-            brickBall.dy = -4;
-        }
-        
-        function updateBrickCount() {
-            document.getElementById('brickCount').textContent = bricks.filter(b => b.active).length;
-        }
-        
-        function drawBrickGame() {
-            brickCtx.fillStyle = 'rgba(15, 20, 25, 0.1)';
-            brickCtx.fillRect(0, 0, brickCanvas.width, brickCanvas.height);
-            
-            for (let brick of bricks) {
-                if (brick.active) {
-                    brickCtx.fillStyle = brick.color;
-                    brickCtx.fillRect(brick.x, brick.y, brick.width, brick.height);
-                    brickCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-                    brickCtx.lineWidth = 1;
-                    brickCtx.strokeRect(brick.x, brick.y, brick.width, brick.height);
-                }
-            }
-            
-            brickCtx.fillStyle = '#ffeb3b';
-            brickCtx.fillRect(brickPaddle.x, brickPaddle.y, brickPaddle.width, brickPaddle.height);
-            
-            brickCtx.beginPath();
-            brickCtx.arc(brickBall.x, brickBall.y, brickBall.radius, 0, Math.PI * 2);
-            brickCtx.fillStyle = '#ff6b6b';
-            brickCtx.fill();
-            brickCtx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-            brickCtx.lineWidth = 2;
-            brickCtx.stroke();
-            
-            document.getElementById('brickScore').textContent = brickScore;
-            document.getElementById('brickLives').textContent = brickLives;
-        }
-        
-        function brickGameLoop() {
-            if (!brickGameRunning || brickGamePaused) {
-                drawBrickGame();
-                requestAnimationFrame(brickGameLoop);
+
+        function reload() {
+            const player = state.player;
+            if (player.reloadTimer > 0 || player.ammo === config.magSize || player.reserveAmmo <= 0 || state.gameOver || state.win) {
                 return;
             }
-            
-            updateBrickPaddle();
-            updateBrickBall();
-            drawBrickGame();
-            
-            if (bricks.every(b => !b.active)) {
-                brickGameRunning = false;
-                document.getElementById('brickMessage').textContent = '🎉 You Won!';
+            player.reloadTimer = config.reloadTime;
+            showStatus("Reloading", "Magazine swap in progress.");
+        }
+
+        function completeReload() {
+            const player = state.player;
+            const needed = config.magSize - player.ammo;
+            const taken = Math.min(needed, player.reserveAmmo);
+            player.ammo += taken;
+            player.reserveAmmo -= taken;
+            showStatus("Reloaded", "Back in the fight.", 1.2);
+            updateHud();
+        }
+
+        function takeDamage(amount) {
+            if (state.gameOver || state.win) {
+                return;
             }
-            
-            requestAnimationFrame(brickGameLoop);
-        }
-        
-        function startBrickGame() {
-            if (!brickGameRunning) {
-                brickGameRunning = true;
-                brickGamePaused = false;
-                document.getElementById('brickMessage').textContent = '';
+
+            const player = state.player;
+            let remaining = amount;
+
+            if (player.armor > 0) {
+                const blocked = Math.min(player.armor, remaining * 0.7);
+                player.armor -= blocked;
+                remaining -= blocked;
+            }
+
+            player.health -= remaining;
+            state.damageFlash = 1;
+            hitFlash.classList.add("visible");
+            setTimeout(() => hitFlash.classList.remove("visible"), 80);
+            updateHud();
+
+            if (player.health <= 0) {
+                player.health = 0;
+                endRun(false);
             }
         }
-        
-        function pauseBrickGame() {
-            if (brickGameRunning) {
-                brickGamePaused = !brickGamePaused;
-            }
-        }
-        
-        function resetBrickGame() {
-            brickScore = 0;
-            brickLives = 3;
-            brickGameRunning = false;
-            brickGamePaused = false;
-            createBricks();
-            resetBrickBall();
-            document.getElementById('brickMessage').textContent = '';
-            drawBrickGame();
-        }
-        
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') brickPaddle.dx = -brickPaddle.speed;
-            if (e.key === 'ArrowRight') brickPaddle.dx = brickPaddle.speed;
-        });
-        
-        document.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') brickPaddle.dx = 0;
-        });
-        
-        brickCanvas.addEventListener('mousemove', handleBrickMouseMove);
-        
-        // ===== 3D PLATFORMER GAME =====
-        const fpsCanvas = document.getElementById('fpsCanvas');
-        const fpsCtx = fpsCanvas.getContext('2d');
-        
-        let fpsRunning = false;
-        let frameCount = 0;
-        let platformerBestHeight = 0;
-        let platformerLevel = 1;
-        
-        // 3D platform data: [x, z, y (height), width, depth, color]
-        const platformerPlatforms = [
-            // Starting platform
-            { x: 5, z: 5, y: 0, width: 3, depth: 3, color: '#00ff00' },
-            
-            // Level 1 platforms
-            { x: 2, z: 10, y: 1.5, width: 2.5, depth: 2.5, color: '#00dd00' },
-            { x: 8, z: 10, y: 1.5, width: 2.5, depth: 2.5, color: '#00dd00' },
-            { x: 5, z: 15, y: 2.5, width: 2, depth: 2, color: '#00bb00' },
-            
-            // Level 2 platforms
-            { x: 1, z: 20, y: 3.5, width: 2, depth: 2, color: '#00aa00' },
-            { x: 9, z: 20, y: 3.5, width: 2, depth: 2, color: '#00aa00' },
-            { x: 5, z: 25, y: 4.5, width: 2.5, depth: 2.5, color: '#008800' },
-            
-            // Level 3 platforms
-            { x: 3, z: 30, y: 5.5, width: 1.5, depth: 1.5, color: '#006600' },
-            { x: 7, z: 30, y: 5.5, width: 1.5, depth: 1.5, color: '#006600' },
-            { x: 5, z: 35, y: 7, width: 3, depth: 3, color: '#ffff00' }, // Goal platform
-        ];
-        
-        const platformerPlayer = {
-            x: 5,
-            z: 5,
-            y: 0.5,
-            vx: 0,
-            vz: 0,
-            vy: 0,
-            speed: 0.08,
-            jumpPower: 0.3,
-            onGround: false,
-            size: 0.3
-        };
-        
-        const gravity = 0.015;
-        
-        function platformerUpdatePlayer() {
-            const keys = fpsKeys;
-            
-            // Horizontal movement
-            let moveX = 0;
-            let moveZ = 0;
-            
-            if (keys['w'] || keys['W']) moveZ += platformerPlayer.speed;
-            if (keys['s'] || keys['S']) moveZ -= platformerPlayer.speed;
-            if (keys['a'] || keys['A']) moveX -= platformerPlayer.speed;
-            if (keys['d'] || keys['D']) moveX += platformerPlayer.speed;
-            
-            platformerPlayer.x += moveX;
-            platformerPlayer.z += moveZ;
-            
-            // Gravity
-            platformerPlayer.vy -= gravity;
-            platformerPlayer.y += platformerPlayer.vy;
-            
-            // Platform collision
-            platformerPlayer.onGround = false;
-            for (let platform of platformerPlatforms) {
-                const px1 = platform.x - platform.width / 2;
-                const px2 = platform.x + platform.width / 2;
-                const pz1 = platform.z - platform.depth / 2;
-                const pz2 = platform.z + platform.depth / 2;
-                
-                // Check if player is above platform
-                if (platformerPlayer.x > px1 && platformerPlayer.x < px2 &&
-                    platformerPlayer.z > pz1 && platformerPlayer.z < pz2) {
-                    
-                    // Player is on the platform
-                    if (platformerPlayer.y - platformerPlayer.size < platform.y + 0.1 && 
-                        platformerPlayer.vy <= 0) {
-                        platformerPlayer.y = platform.y + platformerPlayer.size;
-                        platformerPlayer.vy = 0;
-                        platformerPlayer.onGround = true;
+
+        function updateEnemies(delta) {
+            const player = state.player;
+
+            state.enemies.forEach(enemy => {
+                if (!enemy.alive) {
+                    return;
+                }
+
+                enemy.pulse += delta * 4;
+                enemy.attackTimer = Math.max(0, enemy.attackTimer - delta);
+
+                const dx = player.x - enemy.x;
+                const dy = player.y - enemy.y;
+                const distance = Math.hypot(dx, dy);
+
+                if (distance < 0.001) {
+                    return;
+                }
+
+                const seesPlayer = hasLineOfSight(enemy.x, enemy.y, player.x, player.y);
+
+                if (distance > config.enemyAttackRange && seesPlayer) {
+                    const moveStep = enemy.speed * delta;
+                    const moveX = (dx / distance) * moveStep;
+                    const moveY = (dy / distance) * moveStep;
+                    const targetX = enemy.x + moveX;
+                    const targetY = enemy.y + moveY;
+
+                    if (!collides(targetX, enemy.y, 0.2)) {
+                        enemy.x = targetX;
+                    }
+                    if (!collides(enemy.x, targetY, 0.2)) {
+                        enemy.y = targetY;
                     }
                 }
+
+                if (distance <= config.enemyAttackRange && enemy.attackTimer === 0) {
+                    enemy.attackTimer = config.enemyCooldown;
+                    takeDamage(config.enemyDamage);
+                    showStatus("Under Fire", "Hostile contact at close range.", 1.1);
+                }
+            });
+        }
+
+        function updatePickups() {
+            const player = state.player;
+            state.pickups.forEach(pickup => {
+                if (!pickup.active) {
+                    return;
+                }
+
+                const distance = Math.hypot(player.x - pickup.x, player.y - pickup.y);
+                if (distance > 0.55) {
+                    return;
+                }
+
+                pickup.active = false;
+
+                if (pickup.kind === "ammo") {
+                    player.reserveAmmo += pickup.value;
+                    showStatus("Ammo Cache", "+" + pickup.value + " reserve rounds.", 1.3);
+                } else if (pickup.kind === "med") {
+                    player.health = Math.min(100, player.health + pickup.value);
+                    showStatus("Med Pack", "Recovered " + pickup.value + " health.", 1.3);
+                } else if (pickup.kind === "armor") {
+                    player.armor = Math.min(100, player.armor + pickup.value);
+                    showStatus("Armor Plate", "+" + pickup.value + " armor.", 1.3);
+                }
+
+                updateHud();
+            });
+        }
+
+        function fire() {
+            if (!state.running || state.gameOver || state.win) {
+                return;
             }
-            
-            // Fall off world
-            if (platformerPlayer.y < -5) {
-                platformerResetPlayer();
-                document.getElementById('fpsMessage').textContent = '💀 Fell off! Try again!';
+
+            const player = state.player;
+            if (player.reloadTimer > 0 || player.fireTimer > 0) {
+                return;
             }
-            
-            // Check if reached goal
-            const goalPlatform = platformerPlatforms[platformerPlatforms.length - 1];
-            const goalX1 = goalPlatform.x - goalPlatform.width / 2;
-            const goalX2 = goalPlatform.x + goalPlatform.width / 2;
-            const goalZ1 = goalPlatform.z - goalPlatform.depth / 2;
-            const goalZ2 = goalPlatform.z + goalPlatform.depth / 2;
-            
-            if (platformerPlayer.x > goalX1 && platformerPlayer.x < goalX2 &&
-                platformerPlayer.z > goalZ1 && platformerPlayer.z < goalZ2 &&
-                platformerPlayer.y > goalPlatform.y) {
-                fpsRunning = false;
-                document.getElementById('fpsMessage').textContent = '🎉 Level Complete! Next level!';
-                platformerBestHeight = Math.max(platformerBestHeight, Math.floor(platformerPlayer.y * 10) / 10);
-                platformerLevel++;
+
+            if (player.ammo <= 0) {
+                showStatus("Dry Fire", "No rounds in the magazine. Hit R to reload.", 1.2);
+                player.fireTimer = 0.2;
+                return;
+            }
+
+            player.ammo -= 1;
+            player.fireTimer = config.fireCooldown;
+            state.muzzleFlash = 1;
+
+            let hitEnemy = null;
+            let bestDistance = Infinity;
+
+            state.enemies.forEach(enemy => {
+                if (!enemy.alive) {
+                    return;
+                }
+
+                const dx = enemy.x - player.x;
+                const dy = enemy.y - player.y;
+                const distance = Math.hypot(dx, dy);
+                if (distance > config.hitScanRange) {
+                    return;
+                }
+
+                const angleToEnemy = Math.atan2(dy, dx);
+                const angleDiff = normalizeAngle(angleToEnemy - player.angle);
+                const aimWindow = Math.max(0.05, 0.2 / Math.max(distance, 1));
+
+                if (Math.abs(angleDiff) > aimWindow) {
+                    return;
+                }
+
+                if (!hasLineOfSight(player.x, player.y, enemy.x, enemy.y)) {
+                    return;
+                }
+
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    hitEnemy = enemy;
+                }
+            });
+
+            if (hitEnemy) {
+                const damage = 26 + Math.floor(Math.random() * 16);
+                hitEnemy.health -= damage;
+                showStatus("Hit Confirmed", "Target took " + damage + " damage.", 0.9);
+
+                if (hitEnemy.health <= 0) {
+                    hitEnemy.alive = false;
+                    state.score += 100;
+                    showStatus("Target Down", "Hostile neutralized.", 1.1);
+                } else {
+                    state.score += 20;
+                }
+            } else {
+                showStatus("Shot Fired", "Adjust your aim and keep pressure.", 0.7);
+            }
+
+            updateHud();
+            checkWinState();
+        }
+
+        function checkWinState() {
+            if (state.enemies.every(enemy => !enemy.alive)) {
+                endRun(true);
             }
         }
-        
-        function platformerDrawWorld() {
-            const width = fpsCanvas.width;
-            const height = fpsCanvas.height;
-            
-            // Create a depth buffer
-            const depthBuffer = Array(width).fill(null).map(() => ({}));
-            
-            // Render each platform
-            for (let platform of platformerPlatforms) {
-                // Convert 3D position to screen space
-                const relX = platform.x - platformerPlayer.x;
-                const relZ = platform.z - platformerPlayer.z;
-                const relY = platform.y - platformerPlayer.y;
-                
-                // Simple perspective projection
-                const distance = Math.sqrt(relX * relX + relZ * relZ) + 0.01;
-                const screenX = (width / 2) + (relX / distance) * (width / 4);
-                const screenZ = (relZ / distance);
-                
-                // Skip if behind player
-                if (screenZ <= 0.5) continue;
-                
-                // Scale based on distance
-                const scale = Math.max(5, (height / (distance * 3)));
-                const platformWidth = Math.max(10, scale * (platform.width * 2));
-                const platformHeight = Math.max(5, scale * (platform.depth * 2));
-                
-                // Y position with height offset
-                const screenY = (height / 2) - (relY * scale * 3);
-                
-                // Brightness based on distance
-                const brightness = Math.max(0.3, 1 - (distance / 15));
-                
-                // Draw platform
-                fpsCtx.globalAlpha = brightness;
-                fpsCtx.fillStyle = platform.color;
-                fpsCtx.fillRect(screenX - platformWidth/2, screenY - platformHeight/2, platformWidth, platformHeight);
-                
-                // Platform outline
-                fpsCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-                fpsCtx.lineWidth = 2;
-                fpsCtx.strokeRect(screenX - platformWidth/2, screenY - platformHeight/2, platformWidth, platformHeight);
-                
-                fpsCtx.globalAlpha = 1.0;
+
+        function endRun(win) {
+            state.running = false;
+            state.gameOver = !win;
+            state.win = win;
+            overlay.classList.remove("hidden");
+
+            const dialogTitle = overlay.querySelector("h1");
+            const eyebrow = overlay.querySelector(".eyebrow");
+            const lead = overlay.querySelector(".lead");
+
+            if (win) {
+                eyebrow.textContent = "Arena Cleared";
+                dialogTitle.textContent = "Sector Secure";
+                lead.textContent = "Every hostile is down. Tight work. Restart for another run and shave time off your clear.";
+                showStatus("Victory", "Arena clear. Score " + state.score + ".", 999);
+            } else {
+                eyebrow.textContent = "Run Failed";
+                dialogTitle.textContent = "You Were Overrun";
+                lead.textContent = "The facility pushed back harder than expected. Restart and keep your distance on close corners.";
+                showStatus("Mission Failed", "You were eliminated.", 999);
             }
-            
-            // Draw player (crosshair in center)
-            fpsCtx.fillStyle = '#ff0000';
-            fpsCtx.fillRect(width/2 - 5, height/2 - 5, 10, 10);
-            fpsCtx.strokeStyle = '#ffffff';
-            fpsCtx.lineWidth = 2;
-            fpsCtx.strokeRect(width/2 - 5, height/2 - 5, 10, 10);
-            
-            // Draw background gradient
-            const bgGradient = fpsCtx.createLinearGradient(0, 0, 0, height);
-            bgGradient.addColorStop(0, '#1a1a2e');
-            bgGradient.addColorStop(1, '#16213e');
-            fpsCtx.fillStyle = bgGradient;
-            fpsCtx.fillRect(0, 0, width, height);
-            
-            // Redraw platforms and player over background
-            for (let platform of platformerPlatforms) {
-                const relX = platform.x - platformerPlayer.x;
-                const relZ = platform.z - platformerPlayer.z;
-                const relY = platform.y - platformerPlayer.y;
-                
-                const distance = Math.sqrt(relX * relX + relZ * relZ) + 0.01;
-                const screenX = (width / 2) + (relX / distance) * (width / 4);
-                
-                if (relZ <= 0.5) continue;
-                
-                const scale = Math.max(5, (height / (distance * 3)));
-                const platformWidth = Math.max(10, scale * (platform.width * 2));
-                const platformHeight = Math.max(5, scale * (platform.depth * 2));
-                const screenY = (height / 2) - (relY * scale * 3);
-                const brightness = Math.max(0.3, 1 - (distance / 15));
-                
-                fpsCtx.globalAlpha = brightness;
-                fpsCtx.fillStyle = platform.color;
-                fpsCtx.fillRect(screenX - platformWidth/2, screenY - platformHeight/2, platformWidth, platformHeight);
-                fpsCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-                fpsCtx.lineWidth = 2;
-                fpsCtx.strokeRect(screenX - platformWidth/2, screenY - platformHeight/2, platformWidth, platformHeight);
-                fpsCtx.globalAlpha = 1.0;
+        }
+
+        function hasLineOfSight(x1, y1, x2, y2) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const distance = Math.hypot(dx, dy);
+            const steps = Math.max(3, Math.ceil(distance * 16));
+
+            for (let i = 1; i < steps; i++) {
+                const t = i / steps;
+                const x = x1 + dx * t;
+                const y = y1 + dy * t;
+                if (isWall(x, y)) {
+                    return false;
+                }
             }
-            
-            // Draw player indicator
-            fpsCtx.fillStyle = '#ff0000';
-            fpsCtx.fillRect(width/2 - 5, height/2 - 5, 10, 10);
-            fpsCtx.strokeStyle = '#ffffff';
-            fpsCtx.lineWidth = 2;
-            fpsCtx.strokeRect(width/2 - 5, height/2 - 5, 10, 10);
-            
-            // HUD
-            const currentHeight = Math.max(0, Math.floor(platformerPlayer.y * 10) / 10);
-            document.getElementById('fpsHealth').textContent = currentHeight;
-            document.getElementById('fpsAmmo').textContent = platformerLevel;
-            document.getElementById('fpsKills').textContent = platformerBestHeight;
+
+            return true;
         }
-        
-        function platformerGameLoop() {
-            if (fpsRunning) {
-                platformerUpdatePlayer();
+
+        function normalizeAngle(angle) {
+            while (angle < -Math.PI) {
+                angle += Math.PI * 2;
             }
-            platformerDrawWorld();
-            frameCount++;
-            requestAnimationFrame(platformerGameLoop);
+            while (angle > Math.PI) {
+                angle -= Math.PI * 2;
+            }
+            return angle;
         }
-        
-        function platformerResetPlayer() {
-            platformerPlayer.x = 5;
-            platformerPlayer.z = 5;
-            platformerPlayer.y = 0.5;
-            platformerPlayer.vx = 0;
-            platformerPlayer.vz = 0;
-            platformerPlayer.vy = 0;
+
+        function castRay(angle) {
+            const player = state.player;
+            const stepSize = 0.02;
+            let distance = 0;
+
+            while (distance < config.maxDepth) {
+                const testX = player.x + Math.cos(angle) * distance;
+                const testY = player.y + Math.sin(angle) * distance;
+
+                if (isWall(testX, testY)) {
+                    const tile = map[Math.floor(testY)][Math.floor(testX)];
+                    return {
+                        distance,
+                        tile,
+                        hitX: testX,
+                        hitY: testY
+                    };
+                }
+
+                distance += stepSize;
+            }
+
+            return {
+                distance: config.maxDepth,
+                tile: 1,
+                hitX: player.x + Math.cos(angle) * config.maxDepth,
+                hitY: player.y + Math.sin(angle) * config.maxDepth
+            };
         }
-        
-        function startFpsGame() {
-            fpsRunning = true;
-            document.getElementById('fpsMessage').textContent = 'Jump to the platforms!';
+
+        function resizeCanvas() {
+            const ratio = window.devicePixelRatio || 1;
+            const width = Math.max(640, window.innerWidth);
+            const height = Math.max(420, window.innerHeight);
+            canvas.width = Math.floor(width * ratio);
+            canvas.height = Math.floor(height * ratio);
+            canvas.style.width = width + "px";
+            canvas.style.height = height + "px";
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(ratio, ratio);
         }
-        
-        function resetFpsGame() {
-            fpsRunning = false;
-            platformerLevel = 1;
-            platformerResetPlayer();
-            document.getElementById('fpsMessage').textContent = 'Press Start to begin!';
-            platformerDrawWorld();
+
+        function drawBackground(width, height) {
+            const sky = ctx.createLinearGradient(0, 0, 0, height * 0.6);
+            sky.addColorStop(0, "#28374a");
+            sky.addColorStop(0.55, "#1b2633");
+            sky.addColorStop(1, "#0f1720");
+            ctx.fillStyle = sky;
+            ctx.fillRect(0, 0, width, height * 0.55);
+
+            const floor = ctx.createLinearGradient(0, height * 0.55, 0, height);
+            floorGradientStops.forEach(stop => floor.addColorStop(stop.stop, stop.color));
+            ctx.fillStyle = floor;
+            ctx.fillRect(0, height * 0.55, width, height * 0.45);
         }
-        
-        const fpsKeys = {};
-        document.addEventListener('keydown', (e) => {
-            fpsKeys[e.key] = true;
-            if ((e.key === ' ') && platformerPlayer.onGround && fpsRunning) {
-                platformerPlayer.vy = platformerPlayer.jumpPower;
-                platformerPlayer.onGround = false;
+
+        function drawWorld() {
+            const width = parseFloat(canvas.style.width) || window.innerWidth;
+            const height = parseFloat(canvas.style.height) || window.innerHeight;
+            ctx.clearRect(0, 0, width, height);
+            drawBackground(width, height);
+
+            const zBuffer = new Array(width);
+
+            for (let x = 0; x < width; x++) {
+                const rayAngle = state.player.angle - config.fov / 2 + (x / width) * config.fov;
+                const ray = castRay(rayAngle);
+                const correctedDistance = ray.distance * Math.cos(rayAngle - state.player.angle);
+                zBuffer[x] = correctedDistance;
+
+                const wallHeight = Math.min(height, (height / Math.max(correctedDistance, 0.0001)) * 0.9);
+                const wallTop = (height - wallHeight) / 2;
+                const shade = Math.max(0.18, 1 - correctedDistance / config.maxDepth);
+                const color = hexToRgb(wallColors[ray.tile] || wallColors[1]);
+                const edgeFactor = ((ray.hitX + ray.hitY) % 1);
+                const edgeShade = 0.82 + Math.abs(edgeFactor - 0.5) * 0.35;
+                ctx.fillStyle = "rgb(" +
+                    Math.floor(color.r * shade * edgeShade) + "," +
+                    Math.floor(color.g * shade * edgeShade) + "," +
+                    Math.floor(color.b * shade * edgeShade) + ")";
+
+                ctx.fillRect(x, wallTop, 1, wallHeight);
+
+                ctx.fillStyle = "rgba(0, 0, 0, " + Math.min(0.65, correctedDistance / config.maxDepth) + ")";
+                ctx.fillRect(x, wallTop + wallHeight, 1, height - wallTop - wallHeight);
+            }
+
+            drawSprites(zBuffer, width, height);
+            drawWeapon(width, height);
+        }
+
+        function drawSprites(zBuffer, width, height) {
+            const sprites = [];
+
+            state.pickups.forEach(pickup => {
+                if (!pickup.active) {
+                    return;
+                }
+                sprites.push({
+                    x: pickup.x,
+                    y: pickup.y,
+                    type: "pickup",
+                    pickup
+                });
+            });
+
+            state.enemies.forEach(enemy => {
+                if (!enemy.alive) {
+                    return;
+                }
+                sprites.push({
+                    x: enemy.x,
+                    y: enemy.y,
+                    type: "enemy",
+                    enemy
+                });
+            });
+
+            sprites.sort((a, b) => {
+                const da = Math.hypot(state.player.x - a.x, state.player.y - a.y);
+                const db = Math.hypot(state.player.x - b.x, state.player.y - b.y);
+                return db - da;
+            });
+
+            sprites.forEach(sprite => {
+                const dx = sprite.x - state.player.x;
+                const dy = sprite.y - state.player.y;
+                const distance = Math.hypot(dx, dy);
+                const angle = normalizeAngle(Math.atan2(dy, dx) - state.player.angle);
+
+                if (Math.abs(angle) > config.fov * 0.7 || distance < 0.2) {
+                    return;
+                }
+
+                const size = Math.min(height * 0.9, (height / distance) * (sprite.type === "enemy" ? 0.75 : 0.4));
+                const screenX = width / 2 + Math.tan(angle) * (width / 2) / Math.tan(config.fov / 2);
+                const left = Math.floor(screenX - size / 2);
+                const top = Math.floor(height / 2 - size / (sprite.type === "enemy" ? 1.9 : 2.4));
+
+                for (let stripe = 0; stripe < size; stripe++) {
+                    const column = left + stripe;
+                    if (column < 0 || column >= width) {
+                        continue;
+                    }
+                    if (distance >= zBuffer[column]) {
+                        continue;
+                    }
+
+                    if (sprite.type === "enemy") {
+                        const bodyPulse = 0.9 + Math.sin(sprite.enemy.pulse) * 0.1;
+                        ctx.fillStyle = "rgba(255, " + Math.floor(60 * bodyPulse) + ", " + Math.floor(60 * bodyPulse) + ", 0.92)";
+                    } else if (sprite.pickup.kind === "med") {
+                        ctx.fillStyle = "rgba(123, 211, 137, 0.94)";
+                    } else if (sprite.pickup.kind === "ammo") {
+                        ctx.fillStyle = "rgba(255, 209, 102, 0.94)";
+                    } else {
+                        ctx.fillStyle = "rgba(120, 190, 255, 0.94)";
+                    }
+
+                    ctx.fillRect(column, top, 1, size);
+                }
+
+                if (sprite.type === "enemy") {
+                    const eyeY = top + size * 0.28;
+                    const eyeOffset = size * 0.16;
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillRect(screenX - eyeOffset, eyeY, size * 0.08, size * 0.08);
+                    ctx.fillRect(screenX + eyeOffset - size * 0.08, eyeY, size * 0.08, size * 0.08);
+
+                    const hpRatio = Math.max(0, sprite.enemy.health) / 80;
+                    ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
+                    ctx.fillRect(screenX - size * 0.28, top - 12, size * 0.56, 6);
+                    ctx.fillStyle = "#7bd389";
+                    ctx.fillRect(screenX - size * 0.28, top - 12, size * 0.56 * hpRatio, 6);
+                } else {
+                    ctx.fillStyle = "rgba(255,255,255,0.85)";
+                    ctx.fillRect(screenX - 3, top + size * 0.3, 6, 6);
+                }
+            });
+        }
+
+        function drawWeapon(width, height) {
+            const bob = state.running ? Math.sin(performance.now() * 0.01) * 6 : 0;
+            const muzzle = state.muzzleFlash;
+
+            ctx.save();
+            ctx.translate(width / 2, height);
+
+            ctx.fillStyle = "#2a2f38";
+            ctx.beginPath();
+            ctx.moveTo(-160, 0);
+            ctx.lineTo(-110, -70 + bob);
+            ctx.lineTo(-24, -80 + bob);
+            ctx.lineTo(22, -84 + bob);
+            ctx.lineTo(108, -74 + bob);
+            ctx.lineTo(150, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = "#4b5563";
+            ctx.fillRect(-34, -118 + bob, 68, 44);
+            ctx.fillStyle = "#1b2028";
+            ctx.fillRect(18, -142 + bob, 120, 24);
+            ctx.fillStyle = "#d1d5db";
+            ctx.fillRect(116, -138 + bob, 30, 16);
+
+            if (muzzle > 0) {
+                ctx.fillStyle = "rgba(255, 209, 102, " + muzzle + ")";
+                ctx.beginPath();
+                ctx.moveTo(148, -130 + bob);
+                ctx.lineTo(196, -150 + bob);
+                ctx.lineTo(180, -126 + bob);
+                ctx.lineTo(206, -112 + bob);
+                ctx.lineTo(174, -108 + bob);
+                ctx.lineTo(192, -82 + bob);
+                ctx.lineTo(150, -98 + bob);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            ctx.restore();
+        }
+
+        function hexToRgb(hex) {
+            const stripped = hex.replace("#", "");
+            const int = parseInt(stripped, 16);
+            return {
+                r: (int >> 16) & 255,
+                g: (int >> 8) & 255,
+                b: int & 255
+            };
+        }
+
+        function update(delta) {
+            if (!state.running || state.gameOver || state.win) {
+                updatePlayerTimers(delta);
+                updateHud();
+                return;
+            }
+
+            movePlayer(delta);
+            updatePlayerTimers(delta);
+            updateEnemies(delta);
+            updatePickups();
+            updateHud();
+        }
+
+        function loop(timestamp) {
+            if (!state.lastTime) {
+                state.lastTime = timestamp;
+            }
+
+            const delta = Math.min(0.033, (timestamp - state.lastTime) / 1000);
+            state.lastTime = timestamp;
+
+            update(delta);
+            drawWorld();
+            requestAnimationFrame(loop);
+        }
+
+        function startGame(resetRun = true) {
+            if (resetRun) {
+                resetGame();
+            }
+            state.running = true;
+            overlay.classList.add("hidden");
+            lockPointer();
+            showStatus("Mission Live", "Sweep the arena and survive the push.");
+        }
+
+        function lockPointer() {
+            canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock;
+            if (canvas.requestPointerLock) {
+                canvas.requestPointerLock();
+            }
+        }
+
+        document.addEventListener("pointerlockchange", () => {
+            state.pointerReady = document.pointerLockElement === canvas;
+        });
+
+        document.addEventListener("mousemove", event => {
+            if (!state.pointerReady || !state.running || state.gameOver || state.win) {
+                return;
+            }
+            state.player.angle += event.movementX * config.mouseSensitivity;
+        });
+
+        document.addEventListener("keydown", event => {
+            state.keys[event.key] = true;
+
+            if (event.key === "r" || event.key === "R") {
+                reload();
+            }
+
+            if (event.key === "Escape" && state.running && !state.gameOver && !state.win) {
+                overlay.classList.remove("hidden");
+                showStatus("Paused", "Click Enter Sector to resume and lock the mouse again.", 999);
+                state.running = false;
             }
         });
-        document.addEventListener('keyup', (e) => {
-            fpsKeys[e.key] = false;
+
+        document.addEventListener("keyup", event => {
+            state.keys[event.key] = false;
         });
-        
-        // Initialize games
-        resetBrickGame();
-        brickGameLoop();
-        resetFpsGame();
-        platformerGameLoop();
+
+        canvas.addEventListener("click", () => {
+            if (!state.pointerReady && !state.gameOver && !state.win) {
+                lockPointer();
+            }
+
+            if (!state.running && !state.gameOver && !state.win) {
+                state.running = true;
+                overlay.classList.add("hidden");
+                showStatus("Mission Live", "Back in the fight.");
+            }
+
+            fire();
+        });
+
+        startButton.addEventListener("click", () => {
+            const shouldReset = state.gameOver || state.win || state.score === 0;
+            startGame(shouldReset);
+        });
+
+        restartButton.addEventListener("click", () => startGame(true));
+
+        window.addEventListener("resize", () => {
+            resizeCanvas();
+            drawWorld();
+        });
+
+        resetGame();
+        resizeCanvas();
+        requestAnimationFrame(loop);
     </script>
 </body>
 </html>
