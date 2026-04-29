@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skyline Sprint | Arcade Nexus</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-page="platformer">
+    <div class="game-page">
+        <header class="top-nav">
+            <a class="brand" href="../index.html">
+                <span class="brand-mark">A</span>
+                <span class="brand-text">
+                    <strong>Arcade Nexus</strong>
+                    <small>Play instantly in your browser</small>
+                </span>
+            </a>
+            <div class="page-actions">
+                <a class="back-link" href="../index.html">Back to portal</a>
+                <span class="ghost-button">Game Page</span>
+            </div>
+        </header>
+
+        <section class="page-hero">
+            <div>
+                <p class="eyebrow">Platformer</p>
+                <h1 class="page-title">Skyline Sprint</h1>
+                <p class="game-page-copy">A single-screen rooftop run with jumping, lasers, checkpoints, and shard pickups. Reach the beacon with as many points as possible.</p>
+            </div>
+        </section>
+
+        <section class="page-layout">
+            <div class="game-surface">
+                <div class="canvas-wrap">
+                    <canvas id="gameCanvas" class="game-canvas" width="960" height="540"></canvas>
+                    <div class="canvas-overlay" id="gameOverlay">
+                        <div class="overlay-card">
+                            <p class="eyebrow">Rooftop Run</p>
+                            <h2>Climb, collect, finish clean.</h2>
+                            <p>Use arrow keys or `A/D` to move and `Space` to jump. Reach the goal beacon while collecting every data shard you can.</p>
+                            <div class="page-actions">
+                                <button class="primary-button" id="startGameButton">Start Run</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="canvas-message" id="gameMessage">Reach the beacon at the far right.</div>
+                </div>
+
+                <div class="hud-row">
+                    <div class="hud-panel">
+                        <span class="hud-label">Score</span>
+                        <span class="hud-value" id="scoreValue">0</span>
+                    </div>
+                    <div class="hud-panel">
+                        <span class="hud-label">Shards</span>
+                        <span class="hud-value" id="shardsValue">0/6</span>
+                    </div>
+                    <div class="hud-panel">
+                        <span class="hud-label">Lives</span>
+                        <span class="hud-value" id="livesValue">3</span>
+                    </div>
+                    <div class="hud-panel">
+                        <span class="hud-label">Best</span>
+                        <span class="hud-value" id="bestValue">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <aside>
+                <div class="game-info-card">
+                    <h3>Controls</h3>
+                    <div class="info-list">
+                        <div>`A/D` or arrow keys move</div>
+                        <div>`Space` jumps</div>
+                        <div>Touch lasers and you lose a life</div>
+                    </div>
+                </div>
+
+                <div class="game-info-card">
+                    <h3>Goal</h3>
+                    <div class="info-list">
+                        <div>Collect shards for points.</div>
+                        <div>Reach the goal beacon.</div>
+                        <div>Your best score is saved locally.</div>
+                    </div>
+                    <div class="status-box">
+                        <strong>Status</strong>
+                        <span id="statusText">Ready on the rooftop.</span>
+                    </div>
+                </div>
+            </aside>
+        </section>
+    </div>
+
+    <script src="../assets/js/storage.js"></script>
+    <script src="../assets/js/platformer.js"></script>
+</body>
+</html>

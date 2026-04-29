@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Rush | Arcade Nexus</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-page="runner">
+    <div class="game-page">
+        <header class="top-nav">
+            <a class="brand" href="../index.html">
+                <span class="brand-mark">A</span>
+                <span class="brand-text">
+                    <strong>Arcade Nexus</strong>
+                    <small>Play instantly in your browser</small>
+                </span>
+            </a>
+            <div class="page-actions">
+                <a class="back-link" href="../index.html">Back to portal</a>
+                <span class="ghost-button">Game Page</span>
+            </div>
+        </header>
+
+        <section class="page-hero">
+            <div>
+                <p class="eyebrow">Endless Runner</p>
+                <h1 class="page-title">Neon Rush</h1>
+                <p class="game-page-copy">A straightforward fast runner: the world keeps coming, you jump over barriers, slide under high blockers, and survive long enough to post a serious distance score.</p>
+            </div>
+        </section>
+
+        <section class="page-layout">
+            <div class="game-surface">
+                <div class="canvas-wrap">
+                    <canvas id="gameCanvas" class="game-canvas" width="960" height="540"></canvas>
+                    <div class="canvas-overlay" id="gameOverlay">
+                        <div class="overlay-card">
+                            <p class="eyebrow">Runner Brief</p>
+                            <h2>Stay low, stay fast.</h2>
+                            <p>Press `Space` or `Up` to jump. Press `Down` or `S` to slide. The lane keeps speeding up, so the score comes from survival and clean reactions.</p>
+                            <div class="page-actions">
+                                <button class="primary-button" id="startGameButton">Start Run</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="canvas-message" id="gameMessage">Jump the low barriers. Slide under the tall ones.</div>
+                </div>
+
+                <div class="hud-row">
+                    <div class="hud-panel">
+                        <span class="hud-label">Score</span>
+                        <span class="hud-value" id="scoreValue">0</span>
+                    </div>
+                    <div class="hud-panel">
+                        <span class="hud-label">Speed</span>
+                        <span class="hud-value" id="speedValue">0</span>
+                    </div>
+                    <div class="hud-panel">
+                        <span class="hud-label">Best</span>
+                        <span class="hud-value" id="bestValue">0</span>
+                    </div>
+                    <div class="hud-panel">
+                        <span class="hud-label">Streak</span>
+                        <span class="hud-value" id="streakValue">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <aside>
+                <div class="game-info-card">
+                    <h3>Controls</h3>
+                    <div class="info-list">
+                        <div>`Space` or `Up` jumps</div>
+                        <div>`Down` or `S` slides</div>
+                        <div>The run moves automatically</div>
+                    </div>
+                </div>
+
+                <div class="game-info-card">
+                    <h3>Goal</h3>
+                    <div class="info-list">
+                        <div>Survive longer for more score.</div>
+                        <div>Clear obstacles cleanly to build streak.</div>
+                        <div>Your best score is saved locally.</div>
+                    </div>
+                    <div class="status-box">
+                        <strong>Status</strong>
+                        <span id="statusText">Waiting at the starting line.</span>
+                    </div>
+                </div>
+            </aside>
+        </section>
+    </div>
+
+    <script src="../assets/js/storage.js"></script>
+    <script src="../assets/js/runner.js"></script>
+</body>
+</html>
