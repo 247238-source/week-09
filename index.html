@@ -4,220 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arcade Nexus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body data-page="home">
-    <div class="site-shell">
-        <header class="top-nav">
-            <a class="brand" href="index.html">
-                <span class="brand-mark">A</span>
-                <span class="brand-text">
-                    <strong>Arcade Nexus</strong>
-                    <small>Play instantly in your browser</small>
-                </span>
-            </a>
+<body class="bg-light">
+    <div class="container">
+        <header class="border-bottom py-3 mb-4">
+            <a class="h3 text-primary text-decoration-none" href="index.html">Arcade Nexus</a>
 
-            <nav class="nav-links">
-                <a href="#featured">Featured</a>
-                <a href="#genres">Genres</a>
-                <a href="#progress">Progress</a>
+            <nav class="nav">
+                <a class="nav-link" href="#games">Games</a>
+                <a class="nav-link" href="#about">About</a>
             </nav>
-
-            <span class="ghost-button">Accounts Later</span>
         </header>
 
         <main>
-            <section class="hero">
-                <div class="hero-copy">
-                    <p class="eyebrow">Static Gaming Portal</p>
-                    <h1>Three games, one sharp little hub.</h1>
-                    <p class="hero-text">
-                        Jump between a precision platformer, an endless runner, and a survivor run.
-                        Your best scores stay saved in the browser for now, and the layout is ready for real accounts later.
-                    </p>
-
-                    <div class="hero-actions">
-                        <a class="primary-button" href="#featured">Explore Games</a>
-                        <span class="ghost-button">Static Portal</span>
-                    </div>
-
-                    <div class="hero-stats">
-                        <div class="stat-chip">
-                            <span class="stat-value">3</span>
-                            <span class="stat-label">Live Games</span>
-                        </div>
-                        <div class="stat-chip">
-                            <span class="stat-value">100%</span>
-                            <span class="stat-label">Browser Play</span>
-                        </div>
-                        <div class="stat-chip">
-                            <span class="stat-value">Local</span>
-                            <span class="stat-label">Best Scores</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="hero-panel">
-                    <div class="hero-preview-card">
-                        <p class="panel-kicker">Tonight's rotation</p>
-                        <div class="mini-list">
-                            <div class="mini-item">
-                                <span class="mini-dot platformer"></span>
-                                <div>
-                                    <strong>Skyline Sprint</strong>
-                                    <small>Platform challenge</small>
-                                </div>
-                            </div>
-                            <div class="mini-item">
-                                <span class="mini-dot arena"></span>
-                                <div>
-                                    <strong>Neon Rush</strong>
-                                    <small>Endless runner</small>
-                                </div>
-                            </div>
-                            <div class="mini-item">
-                                <span class="mini-dot survivor"></span>
-                                <div>
-                                    <strong>Last Light</strong>
-                                    <small>Survivor shooter</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <section class="py-4">
+                <p class="text-muted">Static Gaming Portal</p>
+                <h1>Three simple browser games</h1>
+                <p class="lead">
+                    This project uses HTML and Bootstrap 5 for the website layout. JavaScript is used only for
+                    simple game logic such as movement, drawing, collision, and score changes.
+                </p>
+                <a class="btn btn-primary" href="#games">View Games</a>
             </section>
 
-            <section class="section-block" id="featured">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">Featured Games</p>
-                        <h2>Pick a lane and get playing.</h2>
-                    </div>
-                    <p class="section-copy">
-                        Each game opens on its own internal page while keeping the same overall portal style.
-                    </p>
-                </div>
+            <section class="py-4" id="games">
+                <p class="text-muted">Featured Games</p>
+                <h2>Game List</h2>
 
-                <div class="game-grid">
-                    <article class="game-card card-platformer">
-                        <div class="game-art">
-                            <span class="badge">Platformer</span>
-                            <div class="art-lines art-lines-platformer"></div>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-topline">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <span class="badge bg-secondary mb-2">Platformer</span>
                                 <h3>Skyline Sprint</h3>
-                                <span class="score-pill">Playable Now</span>
+                                <p>Move across platforms, collect shards, avoid lasers, and reach the goal.</p>
+                                <p class="text-muted">Controls: A/D or arrows, Space to jump</p>
+                                <a class="btn btn-primary" href="games/platformer.html">Play Game</a>
                             </div>
-                            <p>Dash across floating rooftops, grab data shards, and survive the laser traps before time runs dry.</p>
-                            <div class="card-meta">
-                                <span>Precision Platformer</span>
-                                <span>Arrows + Jump</span>
-                            </div>
-                            <a class="primary-button wide-button" href="games/platformer.html">Play Now</a>
                         </div>
-                    </article>
+                    </div>
 
-                    <article class="game-card card-arena">
-                        <div class="game-art">
-                            <span class="badge">Runner</span>
-                            <div class="art-lines art-lines-arena"></div>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-topline">
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <span class="badge bg-secondary mb-2">Runner</span>
                                 <h3>Neon Rush</h3>
-                                <span class="score-pill">Playable Now</span>
+                                <p>Jump and slide to avoid obstacles while the score increases.</p>
+                                <p class="text-muted">Controls: Space or Up to jump, Down to slide</p>
+                                <a class="btn btn-primary" href="games/runner.html">Play Game</a>
                             </div>
-                            <p>Run automatically through a neon lane, jump hazards, slide under blockers, and survive long enough to push your distance score higher.</p>
-                            <div class="card-meta">
-                                <span>Endless Runner</span>
-                                <span>Jump + Slide</span>
-                            </div>
-                            <a class="primary-button wide-button" href="games/runner.html">Play Now</a>
                         </div>
-                    </article>
+                    </div>
 
-                    <article class="game-card card-survivor">
-                        <div class="game-art">
-                            <span class="badge">Survivor</span>
-                            <div class="art-lines art-lines-survivor"></div>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-topline">
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <span class="badge bg-secondary mb-2">Survival</span>
                                 <h3>Last Light</h3>
-                                <span class="score-pill">Playable Now</span>
+                                <p>Move away from the enemy and collect the health pickup.</p>
+                                <p class="text-muted">Controls: WASD movement</p>
+                                <a class="btn btn-primary" href="games/survivor.html">Play Game</a>
                             </div>
-                            <p>Circle the arena, auto-fire at the nearest target, and survive the escalating rush as long as you can.</p>
-                            <div class="card-meta">
-                                <span>Survivor Shooter</span>
-                                <span>WASD Move</span>
-                            </div>
-                            <a class="primary-button wide-button" href="games/survivor.html">Play Now</a>
                         </div>
-                    </article>
-
-                </div>
-            </section>
-
-            <section class="section-block split-block" id="genres">
-                <div>
-                    <p class="eyebrow">Genres</p>
-                    <h2>Built to feel like a tiny public arcade.</h2>
-                    <p class="section-copy">
-                        Version one stays static and lightweight, but the shape already supports a future account system,
-                        personal dashboards, and persistent progress.
-                    </p>
-                </div>
-
-                <div class="genre-grid">
-                    <div class="genre-panel">
-                        <span class="genre-tag">Shooter</span>
-                        <span class="genre-tag">Runner</span>
-                        <p>Fast obstacle reading, simple controls, and score that climbs with clean survival.</p>
-                    </div>
-                    <div class="genre-panel">
-                        <span class="genre-tag">Platformer</span>
-                        <p>Short, snappy movement challenge with checkpoints and collectibles.</p>
-                    </div>
-                    <div class="genre-panel">
-                        <span class="genre-tag">Survivor</span>
-                        <p>Wave pressure, auto-fire combat, and score that scales with survival time.</p>
                     </div>
                 </div>
             </section>
 
-            <section class="section-block progress-block" id="progress">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">Saved Progress</p>
-                        <h2>Your browser keeps the bragging rights.</h2>
-                    </div>
-                    <p class="section-copy">
-                        Best scores are saved inside each game page. The homepage stays static so the non-game site uses only HTML and CSS.
-                    </p>
-                </div>
+            <section class="py-4" id="about">
+                <p class="text-muted">About</p>
+                <h2>Project Purpose</h2>
 
-                <div class="progress-grid">
-                    <div class="progress-card">
-                        <span class="progress-label">Skyline Sprint</span>
-                        <strong>Saved In Game</strong>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3>HTML</h3>
+                                <p>Creates the pages, headings, cards, buttons, and game screens.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="progress-card">
-                        <span class="progress-label">Neon Rush</span>
-                        <strong>Saved In Game</strong>
+
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3>Bootstrap 5</h3>
+                                <p>Adds basic colors, spacing, grid layout, cards, and buttons.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="progress-card">
-                        <span class="progress-label">Last Light</span>
-                        <strong>Saved In Game</strong>
+
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3>JavaScript</h3>
+                                <p>Runs the small games using canvas, keyboard input, and simple functions.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
+
+            
         </main>
 
-        <footer class="site-footer">
-            <p>Arcade Nexus is a static student project hub designed for future public expansion.</p>
+        <footer class="border-top py-3 mt-4 text-muted">
+            <p>247238@students.au.edu.pk - Maaz Qaisar</p>
         </footer>
     </div>
-
 </body>
 </html>

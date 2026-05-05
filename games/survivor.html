@@ -4,96 +4,101 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Last Light | Arcade Nexus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
-<body data-page="survivor">
-    <div class="game-page">
-        <header class="top-nav">
-            <a class="brand" href="../index.html">
-                <span class="brand-mark">A</span>
-                <span class="brand-text">
-                    <strong>Arcade Nexus</strong>
-                    <small>Play instantly in your browser</small>
-                </span>
-            </a>
-            <div class="page-actions">
-                <a class="back-link" href="../index.html">Back to portal</a>
-                <span class="ghost-button">Game Page</span>
-            </div>
+<body class="bg-light">
+    <div class="container">
+        <header class="border-bottom py-3 mb-4">
+            <a class="h3 text-primary text-decoration-none" href="../index.html">Arcade Nexus</a>
+            <nav class="nav">
+                <a class="nav-link" href="../index.html">Home</a>
+            </nav>
         </header>
 
-        <section class="page-hero">
-            <div>
-                <p class="eyebrow">Survivor</p>
-                <h1 class="page-title">Last Light</h1>
-                <p class="game-page-copy">An auto-firing survivor shooter. Stay alive, kite the swarm, and let the score snowball as enemy pressure ramps up.</p>
-            </div>
-        </section>
+        <main>
+            <section class="py-3">
+                <p class="text-muted">Survival</p>
+                <h1>Last Light</h1>
+                <p class="lead">Move away from the enemy and collect the green health pickup.</p>
+            </section>
 
-        <section class="page-layout">
-            <div class="game-surface">
-                <div class="canvas-wrap">
-                    <canvas id="gameCanvas" class="game-canvas" width="960" height="540"></canvas>
-                    <div class="canvas-overlay" id="gameOverlay">
-                        <div class="overlay-card">
-                            <p class="eyebrow">Survival Brief</p>
-                            <h2>Keep the light alive.</h2>
-                            <p>Move with `WASD` and your blaster will fire automatically at the nearest enemy. Stay moving or the swarm will fold in on you.</p>
-                            <div class="page-actions">
-                                <button class="primary-button" id="startGameButton">Start Run</button>
+            <section class="row">
+                <div class="col-lg-9 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="canvas-box">
+                                <canvas id="gameCanvas" class="game-canvas" width="960" height="540"></canvas>
+
+                                <div class="game-overlay" id="gameOverlay">
+                                    <div class="card game-panel">
+                                        <div class="card-body">
+                                            <p class="text-muted">Instructions</p>
+                                            <h2>Start survival mode</h2>
+                                            <p>Use WASD to move. Avoid the red enemy.</p>
+                                            <button class="btn btn-primary" id="startGameButton">Start Game</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="game-message" id="gameMessage">Avoid the red enemy.</div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-sm-4 mb-2">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <span class="text-muted">Score</span>
+                                            <strong class="d-block" id="scoreValue">0</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4 mb-2">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <span class="text-muted">Health</span>
+                                            <strong class="d-block" id="healthValue">100</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4 mb-2">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <span class="text-muted">Time</span>
+                                            <strong class="d-block" id="timeValue">0</strong>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="canvas-message" id="gameMessage">Move early. Getting surrounded ends runs fast.</div>
                 </div>
 
-                <div class="hud-row">
-                    <div class="hud-panel">
-                        <span class="hud-label">Score</span>
-                        <span class="hud-value" id="scoreValue">0</span>
+                <aside class="col-lg-3">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h3>Controls</h3>
+                            <ul>
+                                <li>WASD moves the player</li>
+                                <li>Red square is the enemy</li>
+                                <li>Green square gives health</li>
+                            </ul>
+                        </div>
                     </div>
-                    <div class="hud-panel">
-                        <span class="hud-label">Health</span>
-                        <span class="hud-value" id="healthValue">100</span>
-                    </div>
-                    <div class="hud-panel">
-                        <span class="hud-label">Best</span>
-                        <span class="hud-value" id="bestValue">0</span>
-                    </div>
-                    <div class="hud-panel">
-                        <span class="hud-label">Time</span>
-                        <span class="hud-value" id="timeValue">0</span>
-                    </div>
-                </div>
-            </div>
 
-            <aside>
-                <div class="game-info-card">
-                    <h3>Controls</h3>
-                    <div class="info-list">
-                        <div>`WASD` move</div>
-                        <div>The blaster auto-fires</div>
-                        <div>Blue pickups heal you</div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h3>Status</h3>
+                            <p id="statusText">Ready to start.</p>
+                        </div>
                     </div>
-                </div>
-
-                <div class="game-info-card">
-                    <h3>Goal</h3>
-                    <div class="info-list">
-                        <div>Survive longer for more points.</div>
-                        <div>Enemy count rises over time.</div>
-                        <div>Your best score is saved locally.</div>
-                    </div>
-                    <div class="status-box">
-                        <strong>Status</strong>
-                        <span id="statusText">Waiting for the first wave.</span>
-                    </div>
-                </div>
-            </aside>
-        </section>
+                </aside>
+            </section>
+        </main>
     </div>
 
-    <script src="../assets/js/storage.js"></script>
     <script src="../assets/js/survivor.js"></script>
 </body>
 </html>
